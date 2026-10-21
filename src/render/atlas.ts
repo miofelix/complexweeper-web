@@ -1,4 +1,5 @@
-// 图集加载与槽位索引。图集文件由 素材/图集.png + 图集.json 原样拷贝而来。
+// 图集加载与槽位索引。图集文件由 素材/图集.png + 图集.json 原样拷贝而来；
+// 黑白图集 素材/图集黑白.png 与彩色图集同尺寸、同槽位，共用一份槽位表。
 
 import { ACHIEVABLE, HYPER_ACHIEVABLE, type GameMode } from '../game/constants';
 
@@ -27,21 +28,26 @@ export interface Slot {
 
 export class Atlas {
   image!: HTMLImageElement;
+  /** 黑白图集；缺失或尺寸不符时为 null，关掉颜色后仍画彩色（与上游一致）。 */
+  monoImage: HTMLImageElement | null = null;
   slots = new Map<string, Slot>();
   /** D 值 → num 贴图槽位（num_by_D 的 TS 版） */
   numByD = new Map<number, Slot>();
   /** 有符号 D 值 → 双曲数字贴图槽位。 */
   hyperNumByD = new Map<number, Slot>();
 
-  async load(imageUrl: string, jsonUrl: string): Promise<void> {
-    const [img, meta] = await Promise.all([
+  async load(imageUrl: string, jsonUrl: string, monoUrl?: string): Promise<void> {
+    const [img, meta, mono] = await Promise.all([
       loadImage(imageUrl),
       fetch(jsonUrl).then((r) => {
         if (!r.ok) throw new Error(`加载图集元数据失败: ${r.status}`);
         return r.json() as Promise<{ width: number; height: number; slots: Slot[] }>;
       }),
+      // 黑白图集可选：加载失败不影响开局。
+      monoUrl ? loadImage(monoUrl).catch(() => null) : null,
     ]);
     this.image = img;
+    this.monoImage = mono && mono.naturalWidth === meta.width && mono.naturalHeight === meta.height ? mono : null;
     this.slots.clear();
     this.numByD.clear();
     this.hyperNumByD.clear();
@@ -59,6 +65,11 @@ export class Atlas {
     const s = this.slots.get(name);
     if (!s) throw new Error(`图集缺槽位: ${name}`);
     return s;
+  }
+
+  /** 当前该用哪份图集：关掉颜色用黑白那份，没加载成功就退回彩色（对应上游 activeAtlas）。 */
+  sheet(mono: boolean): HTMLImageElement {
+    return mono && this.monoImage ? this.monoImage : this.image;
   }
 
   flagSprite(t: number, mode: GameMode = 'complex'): Slot {

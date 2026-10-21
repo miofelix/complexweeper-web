@@ -1,7 +1,7 @@
 // 界面文案集中一处（游戏本体仅中文，与原桌面版一致）。
 
 export const APP_TITLE = '复扫雷 Complexweeper';
-export const APP_VERSION = '1.2.0-web';
+export const APP_VERSION = '1.3.0-web';
 
 export const MODE_LABELS = { complex: '圆复数模式', hyper: '双曲复数模式（闵可夫斯基模式）' } as const;
 
@@ -29,6 +29,7 @@ F2开局。
 触控笔：笔尖翻开，侧键插旗。
 
 自定义：可设置总雷数并随机分配类型，或指定四种雷的配比。
+颜色：默认彩色贴图，工具条可关闭以改用黑白贴图，并保存选择供下次打开使用。
 音效：踩雷音按雷型区分，通关播放胜利音，每整秒播放计时音；默认开启，工具条可关闭，关闭时立即停止当前音效，并保存选择供下次打开使用。`;
 
 export const ABOUT_TEXT = `${APP_TITLE} ${APP_VERSION}
@@ -38,7 +39,7 @@ export const ABOUT_TEXT = `${APP_TITLE} ${APP_VERSION}
 原仓库：github.com/Yueqing-Chen/complexweeper-A-minesweeper-game
 感谢原作者及各位贡献者，原作与本修改版均按 GPL-3.0 发布。
 
-已同步至上游 v1.2.0，包含圆复数模式、双曲复数模式（闵可夫斯基模式）、终局标记反馈、音效及声音偏好保存。
+已同步至上游 v1.3.0，包含圆复数模式、双曲复数模式（闵可夫斯基模式）、终局标记反馈、音效、黑白贴图及颜色与声音偏好保存。
 
 Web 移植与维护：miofelix
 将原桌面程序重构为浏览器版本，完善桌面与手机操作、自定义配置、最高分纪录及 PWA 离线支持，并持续修复交互问题。

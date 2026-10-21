@@ -17,7 +17,7 @@ This repository is a modified version (fork) of [Yueqing-Chen/complexweeper-A-mi
 
 Many thanks to the original author 青月晓 for designing and open-sourcing this unique complex-number minesweeper, and to contributors such as [VoidForge](https://github.com/VoidForge) for their fixes and improvements to the original repository. The original code is licensed under GPL-3.0, and the modifications in this repository are published under the same license (see `LICENSE`).
 
-Upstream features have been ported from the original fork point `577750e` (v1.0.12) through `80502e5` (v1.2.0). See [docs/UPSTREAM.md](docs/UPSTREAM.md) for the scope and future synchronization steps.
+Upstream features have been ported from the original fork point `577750e` (v1.0.12) through `f6b80bb` (v1.3.0). See [docs/UPSTREAM.md](docs/UPSTREAM.md) for the scope and future synchronization steps.
 
 ## Rules
 
@@ -57,6 +57,8 @@ Flag mode also makes left clicks cycle flags. With a pen, the tip reveals and th
 
 The third and fourth flags use i or j according to the mode. Four mine sounds, a victory sound, and a once-per-second timer tick are enabled by default and can be muted with the sound button. The browser saves your choice for future visits.
 
+The color button switches between color and black-and-white sprites. Color is the default; switching takes effect immediately without affecting the current game, and the browser remembers this choice too.
+
 ## Difficulty
 
 - Beginner: 9×9, 10 mines
@@ -89,7 +91,7 @@ npm run preview    # preview the production build locally
 ## Project Structure
 
 ```
-public/assets/   image assets (sprite atlas PNG + slot JSON, icons), plus sounds/
+public/assets/   image assets (color and black-and-white atlas PNGs + slot JSON, icons), plus sounds/
 src/game/        rule engine (pure TypeScript, no DOM, independently testable)
 src/render/      Canvas 2D rendering (atlas loading, layout, painting)
 src/input/       mouse + touch input → semantic actions

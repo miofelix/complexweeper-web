@@ -6,7 +6,7 @@ import { Atlas } from '../render/atlas';
 import { Renderer } from '../render/renderer';
 import { makeLayout } from '../render/layout';
 import { InputController, nowMs } from '../input/input';
-import { loadScores, loadSoundEnabled, mergeScores, saveScores, saveSoundEnabled, type Scores } from './storage';
+import { loadColorEnabled, loadScores, loadSoundEnabled, mergeScores, saveColorEnabled, saveScores, saveSoundEnabled, type Scores } from './storage';
 import { isDialogOpen, showAbout, showCustomDialog, showHelp, showScores } from './dialogs';
 import { APP_TITLE, APP_VERSION } from './strings';
 import { GameAudio } from './audio';
@@ -25,6 +25,7 @@ export class App {
   private scores: Record<GameMode, Scores> = { complex: loadScores(), hyper: loadScores('hyper') };
   private audio = new GameAudio();
   private sound_enabled = loadSoundEnabled();
+  private color_enabled = loadColorEnabled();
   private over_sound_done = false;
   private tick_second = 0;
   private timer_id: number | null = null;
@@ -43,7 +44,7 @@ export class App {
   }
 
   async start(): Promise<void> {
-    await this.atlas.load('assets/atlas.png', 'assets/atlas.json');
+    await this.atlas.load('assets/atlas.png', 'assets/atlas.json', 'assets/atlas-bw.png');
     this.renderer = new Renderer(this.atlas);
     this.input = new InputController({
       game: this.game,
@@ -96,6 +97,7 @@ export class App {
       faceFlashUntil: this.face_flash_until,
       now: nowMs(),
       timerSeconds: this.timerSeconds(),
+      mono: !this.color_enabled,
     });
   }
 
@@ -413,6 +415,12 @@ export class App {
       button?.setAttribute('aria-pressed', String(this.input.flagMode));
     });
     document.getElementById('btn-flag-mode')?.setAttribute('aria-pressed', String(this.input.flagMode));
+    on('btn-color', () => {
+      this.color_enabled = !this.color_enabled;
+      saveColorEnabled(this.color_enabled);
+      this.syncToolbar();
+      this.requestRender();
+    });
     on('btn-sound', () => {
       this.sound_enabled = !this.sound_enabled;
       this.audio.setMuted(!this.sound_enabled);
@@ -451,6 +459,10 @@ export class App {
         button?.setAttribute('aria-pressed', String(selected));
       });
     }
+    const color = document.getElementById('btn-color');
+    color?.classList.toggle('active', this.color_enabled);
+    color?.setAttribute('aria-pressed', String(this.color_enabled));
+    if (color) color.textContent = this.color_enabled ? '颜色：开' : '颜色：关';
     const sound = document.getElementById('btn-sound');
     sound?.classList.toggle('active', this.sound_enabled);
     sound?.setAttribute('aria-pressed', String(this.sound_enabled));

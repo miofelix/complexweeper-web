@@ -38,6 +38,8 @@ export interface PaintState {
   now: number;
   /** 计时器显示的秒数 */
   timerSeconds: number;
+  /** 「颜色」关掉：贴图改用黑白图集（对应 color_off） */
+  mono: boolean;
 }
 
 export function counterValue(game: Game, t: number): number {
@@ -125,6 +127,8 @@ export function faceSpriteName(game: Game, st: PaintState): string {
 
 export class Renderer {
   private atlas: Atlas;
+  /** 本帧是否取黑白图集（paint 开头按 PaintState 设定） */
+  private mono = false;
 
   constructor(atlas: Atlas) {
     this.atlas = atlas;
@@ -147,7 +151,7 @@ export class Renderer {
   }
 
   private blit(ctx: CanvasRenderingContext2D, s: Slot, dx: number, dy: number, dw: number, dh: number): void {
-    ctx.drawImage(this.atlas.image, s.x, s.y, s.w, s.h, dx, dy, dw, dh);
+    ctx.drawImage(this.atlas.sheet(this.mono), s.x, s.y, s.w, s.h, dx, dy, dw, dh);
   }
 
   private blitSq(ctx: CanvasRenderingContext2D, s: Slot, x: number, y: number, size: number): void {
@@ -187,6 +191,7 @@ export class Renderer {
   }
 
   paint(ctx: CanvasRenderingContext2D, game: Game, L: Layout, st: PaintState): void {
+    this.mono = st.mono;
     // 背景
     this.fill(ctx, 0, 0, L.client_w, L.client_h, C_BTNFACE);
     // 外框（凸起）

@@ -97,6 +97,7 @@ const resources = {
   'assets/index-12345678.js': 'window.playable = true;',
   'assets/atlas.json': '{"version":1}',
   'assets/atlas.png': 'atlas pixels',
+  'assets/atlas-bw.png': 'monochrome atlas pixels',
   'manifest.webmanifest': '{"start_url":"./"}',
   'assets/icon-192.png': 'icon pixels',
   'assets/sounds/tick.wav': 'timer sound',
@@ -208,7 +209,7 @@ describe('build-derived precache', () => {
     const source = await readFile(join(dir, 'sw.js'), 'utf8');
     expect(first.entries.map((entry) => entry.path)).toEqual(expect.arrayContaining([
       'index.html', 'assets/index-12345678.js', 'assets/index-12345678.css', 'manifest.webmanifest',
-      'assets/atlas.json', 'assets/atlas.png', 'assets/icon-192.png', 'assets/icon-512.png',
+      'assets/atlas.json', 'assets/atlas.png', 'assets/atlas-bw.png', 'assets/icon-192.png', 'assets/icon-512.png',
       'assets/sounds/tick.wav',
     ]));
     expect(source).toContain(first.revision);

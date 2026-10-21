@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { loadScores, loadSoundEnabled, saveScores, saveSoundEnabled } from '../src/app/storage';
+import { loadColorEnabled, loadScores, loadSoundEnabled, saveColorEnabled, saveScores, saveSoundEnabled } from '../src/app/storage';
 
 const KEY = 'complexweeper-web.scores.v1';
 let records: Map<string, string>;
@@ -40,6 +40,31 @@ describe('sound preference storage', () => {
     });
     expect(loadSoundEnabled()).toBe(true);
     expect(() => saveSoundEnabled(false)).not.toThrow();
+  });
+});
+
+describe('color preference storage', () => {
+  it('defaults to color, restores both saved choices, and stays independent of sound', () => {
+    expect(loadColorEnabled()).toBe(true);
+    saveColorEnabled(false);
+    expect(records.get('complexweeper-web.color.v1')).toBe('0');
+    expect(loadColorEnabled()).toBe(false);
+    expect(loadSoundEnabled()).toBe(true);
+    saveSoundEnabled(false);
+    saveColorEnabled(true);
+    expect(loadColorEnabled()).toBe(true);
+    expect(loadSoundEnabled()).toBe(false);
+  });
+
+  it('uses color for invalid saved values and when storage access is denied', () => {
+    records.set('complexweeper-web.color.v1', 'invalid');
+    expect(loadColorEnabled()).toBe(true);
+    vi.stubGlobal('localStorage', {
+      getItem: () => { throw new Error('Storage reads denied'); },
+      setItem: () => { throw new Error('Storage writes denied'); },
+    });
+    expect(loadColorEnabled()).toBe(true);
+    expect(() => saveColorEnabled(false)).not.toThrow();
   });
 });
 

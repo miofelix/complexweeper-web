@@ -38,6 +38,7 @@ const st = (over: Partial<PaintState> = {}): PaintState => ({
   faceFlashUntil: 0,
   now: 0,
   timerSeconds: 0,
+  mono: false,
   ...over,
 });
 
@@ -296,7 +297,7 @@ describe('状态 → 贴图', () => {
   });
 });
 
-describe('上游 1.1.3 图集', () => {
+describe('上游 1.3.0 图集', () => {
   it('图像尺寸、槽位边界与两种模式全部显示值一致', () => {
     const png = readFileSync(new URL('../public/assets/atlas.png', import.meta.url));
     expect(png.readUInt32BE(16)).toBe(atlasMeta.width);
@@ -322,6 +323,15 @@ describe('上游 1.1.3 图集', () => {
     expect(names.has('led_j')).toBe(true);
   });
 
+  it('黑白图集与彩色图集同尺寸，且为 8 位灰度图', () => {
+    const png = readFileSync(new URL('../public/assets/atlas-bw.png', import.meta.url));
+    expect(png.readUInt32BE(16)).toBe(atlasMeta.width);
+    expect(png.readUInt32BE(20)).toBe(atlasMeta.height);
+    expect(png[24]).toBe(8);
+    // 灰度（带或不带 alpha）在底色上直接绘制，与上游 atlas_bw.bin 的灰度换算一致。
+    expect([0, 4]).toContain(png[25]);
+  });
+
   it('图集加载建立复数及双曲模式的完整数字映射', async () => {
     class LoadedImage {
       onload?: () => void;
@@ -340,6 +350,73 @@ describe('上游 1.1.3 图集', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+
+  it('关掉颜色时用黑白图集；黑白图集缺失或尺寸不符时退回彩色', async () => {
+    const sizes = new Map<string, [number, number]>([
+      ['/atlas.png', [atlasMeta.width, atlasMeta.height]],
+      ['/atlas-bw.png', [atlasMeta.width, atlasMeta.height]],
+      ['/atlas-bw-small.png', [atlasMeta.width - 1, atlasMeta.height]],
+    ]);
+    class SizedImage {
+      onload?: () => void;
+      onerror?: () => void;
+      naturalWidth = 0;
+      naturalHeight = 0;
+      url = '';
+      set src(value: string) {
+        this.url = value;
+        const size = sizes.get(value);
+        Promise.resolve().then(() => {
+          if (!size) return this.onerror?.();
+          [this.naturalWidth, this.naturalHeight] = size;
+          this.onload?.();
+        });
+      }
+    }
+    vi.stubGlobal('Image', SizedImage);
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => atlasMeta })));
+    try {
+      const atlas = new Atlas();
+      await atlas.load('/atlas.png', '/atlas.json', '/atlas-bw.png');
+      expect((atlas.sheet(false) as unknown as SizedImage).url).toBe('/atlas.png');
+      expect((atlas.sheet(true) as unknown as SizedImage).url).toBe('/atlas-bw.png');
+      for (const missing of ['/missing-bw.png', '/atlas-bw-small.png', undefined]) {
+        await atlas.load('/atlas.png', '/atlas.json', missing);
+        expect(atlas.monoImage).toBeNull();
+        expect(atlas.sheet(true)).toBe(atlas.image);
+        expect(atlas.slot('closed').name).toBe('closed');
+      }
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('关掉颜色时每张贴图都从黑白图集绘制', () => {
+    const color = {} as HTMLImageElement;
+    const mono = {} as HTMLImageElement;
+    const atlas = new Atlas();
+    atlas.image = color;
+    atlas.monoImage = mono;
+    for (const slot of atlasMeta.slots) atlas.slots.set(slot.name, slot);
+    const renderer = new Renderer(atlas);
+    const g = new Game();
+    g.started = true;
+    const sheets: HTMLImageElement[] = [];
+    const ctx = {
+      fillRect: vi.fn(),
+      drawImage: (image: HTMLImageElement) => { sheets.push(image); },
+    } as unknown as CanvasRenderingContext2D;
+    for (const [paintState, expected] of [[st({ mono: true }), mono], [st(), color]] as const) {
+      sheets.length = 0;
+      renderer.paint(ctx, g, makeLayout(1, g), paintState);
+      expect(sheets.length).toBeGreaterThan(g.n);
+      expect(sheets.every((image) => image === expected)).toBe(true);
+    }
+    atlas.monoImage = null;
+    sheets.length = 0;
+    renderer.paint(ctx, g, makeLayout(1, g), st({ mono: true }));
+    expect(sheets.every((image) => image === color)).toBe(true);
   });
 
   it('计雷器随模式切换单位和旗帜；开局前单位仍为空格', () => {

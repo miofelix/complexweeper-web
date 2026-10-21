@@ -4,13 +4,17 @@
 
 *The image assets in this repository fall into two categories with different licensing. Read this before redistributing, republishing, or using them commercially.*
 
-素材位于 `public/assets/atlas.png`（208×207 的整图）+ `public/assets/atlas.json`（槽位表），由上游 v1.1.3（`8932be5`）的 `素材/图集.png` / `素材/图集.json` 原样拷贝而来。下面用槽位名指认具体是哪几张。
+素材位于 `public/assets/atlas.png`（208×207 的整图）+ `public/assets/atlas.json`（槽位表），由上游 v1.3.0（`f6b80bb`）的 `素材/图集.png` / `素材/图集.json` 原样拷贝而来。黑白图集 `public/assets/atlas-bw.png` 由同一版本的 `素材/图集黑白.png` 原样拷贝，尺寸和槽位与彩色图集相同，在「颜色」关闭时使用。下面用槽位名指认具体是哪几张。
 
-*The assets live in `public/assets/atlas.png` (a 208×207 sheet) and `public/assets/atlas.json` (slot table), copied unchanged from upstream v1.1.3 (`8932be5`). Slots are referred to by name below.*
+*The assets live in `public/assets/atlas.png` (a 208×207 sheet) and `public/assets/atlas.json` (slot table), copied unchanged from upstream v1.3.0 (`f6b80bb`). The black-and-white atlas `public/assets/atlas-bw.png` is copied unchanged from the same version's `素材/图集黑白.png`; it has the same size and slots as the color atlas and is used when color is switched off. Slots are referred to by name below.*
 
-同步至 v1.2.0（`80502e5`）时，上游图集与音效均未改变，沿用上述来源版本。模式与雷名按 v1.2.0 更新：圆复数模式，以及双曲复数模式（闵可夫斯基模式）；双曲模式的实雷又称类空雷，双曲虚雷又称类时雷，j 为类时单位。
+同步至 v1.3.0（`f6b80bb`）时，上游新增黑白图集，彩色图集只把 `hnum_49_i` 槽位的两个透明像素补成底色；音效未变。模式与雷名沿用 v1.2.0：圆复数模式，以及双曲复数模式（闵可夫斯基模式）；双曲模式的实雷又称类空雷，双曲虚雷又称类时雷，j 为类时单位。
 
-*The upstream atlas and sounds did not change in the v1.2.0 (`80502e5`) synchronization, so their source version remains v1.1.3. The terminology now follows v1.2.0: circular complex mode and split-complex mode (Minkowski mode); in the latter, real mines are also called spacelike mines, split-imaginary mines are timelike mines, and j is the timelike unit.*
+*The v1.3.0 (`f6b80bb`) synchronization added upstream's black-and-white atlas; the color atlas only filled two transparent pixels of the `hnum_49_i` slot with the background color, and the sounds did not change. The terminology follows v1.2.0: circular complex mode and split-complex mode (Minkowski mode); in the latter, real mines are also called spacelike mines, split-imaginary mines are timelike mines, and j is the timelike unit.*
+
+黑白图集是同一套槽位的黑白版本，每个槽位的权利归属与下面两张表中的同名槽位相同。上游素材说明尚未单独列出这张图。
+
+*The black-and-white atlas is a monochrome rendition of the same slots; each slot carries the same rights as the slot of the same name in the tables below. Upstream's asset notice does not list this sheet separately yet.*
 
 ## 一、扫雷原始图像素材 —— 权利属于 Microsoft / Original Minesweeper graphics — © Microsoft
 
@@ -30,9 +34,9 @@ v1.1.x 新增的 `hflag_*` / `hmine_*` / `hboom_*` / `hwrong_*`、`right_*` / `r
 
 *The new split-complex and end-of-game sprite families (`hflag_*`, `hmine_*`, `hboom_*`, `hwrong_*`, `right_*`, `rightflag_*`, `wrongflag_*`, their h variants, and `wrongblank`) are upstream additions or adaptations. Upstream's detailed notice does not yet list these slots; the Microsoft rights notice above continues to apply to underlying classic cell, mine, and flag graphics.*
 
-**要商用或正式再发布**：请自行确认这部分素材的可用性，或者把它们换成你自己的图——改 `public/assets/atlas.png` 里对应的那几个矩形即可（槽位坐标见 `public/assets/atlas.json`）。
+**要商用或正式再发布**：请自行确认这部分素材的可用性，或者把它们换成你自己的图——改 `public/assets/atlas.png` 和 `public/assets/atlas-bw.png` 里对应的那几个矩形即可（槽位坐标见 `public/assets/atlas.json`）。
 
-***For commercial or formal redistribution**: verify the usability of these assets yourself, or replace them with your own art — edit the corresponding rectangles in `public/assets/atlas.png` (slot coordinates are in `public/assets/atlas.json`).*
+***For commercial or formal redistribution**: verify the usability of these assets yourself, or replace them with your own art — edit the corresponding rectangles in `public/assets/atlas.png` and `public/assets/atlas-bw.png` (slot coordinates are in `public/assets/atlas.json`).*
 
 ## 二、原创与新增素材 —— 青月晓，随本仓库按 GPL-3.0 发布 / Original additions — by 青月晓, GPL-3.0
 

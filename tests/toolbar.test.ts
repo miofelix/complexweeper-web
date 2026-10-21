@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../src/app/app';
 import { GameAudio } from '../src/app/audio';
 import { showCustomDialog, showScores } from '../src/app/dialogs';
-import { loadSoundEnabled, saveScores, saveSoundEnabled } from '../src/app/storage';
+import { loadColorEnabled, loadSoundEnabled, saveColorEnabled, saveScores, saveSoundEnabled } from '../src/app/storage';
 import type { GameMode } from '../src/game/constants';
 import type { Game } from '../src/game/game';
 import { InputController } from '../src/input/input';
@@ -54,6 +54,16 @@ function makeToolbar(): { app: App; game: Game } {
   }
   internal.syncToolbar();
   return { app, game: internal.game };
+}
+
+/** Paints one frame with a stub renderer and reports whether it used the black-and-white atlas. */
+function paintsMono(app: App): boolean {
+  const paint = vi.fn();
+  const internal = app as unknown as { renderer: { paint: typeof paint }; ctx: object; render(): void };
+  internal.renderer = { paint };
+  internal.ctx = { setTransform: vi.fn() };
+  internal.render();
+  return paint.mock.calls[0][3].mono;
 }
 
 function expectSelected(mode: GameMode, difficulty: string): void {
@@ -187,6 +197,60 @@ describe('real page toolbar', () => {
     button.click();
     expect(GameAudio.prototype.setMuted).toHaveBeenLastCalledWith(false);
     expect(button.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('switches the board between color and black-and-white sprites and saves the choice', () => {
+    const { app } = makeToolbar();
+    const button = element('btn-color');
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(button.classList.contains('active')).toBe(true);
+    expect(button.textContent).toBe('颜色：开');
+    expect(paintsMono(app)).toBe(false);
+    vi.mocked(app.requestRender).mockClear();
+    button.click();
+    expect(app.requestRender).toHaveBeenCalledTimes(1);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(button.classList.contains('active')).toBe(false);
+    expect(button.textContent).toBe('颜色：关');
+    expect(loadColorEnabled()).toBe(false);
+    expect(paintsMono(app)).toBe(true);
+    button.click();
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(button.textContent).toBe('颜色：开');
+    expect(loadColorEnabled()).toBe(true);
+    expect(paintsMono(app)).toBe(false);
+    expect(loadSoundEnabled()).toBe(true);
+    expect(element('btn-sound').getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('restores black-and-white sprites for the first paint and keeps them across new games and modes', () => {
+    saveColorEnabled(false);
+    const { app } = makeToolbar();
+    const button = element('btn-color');
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(button.textContent).toBe('颜色：关');
+    expect(paintsMono(app)).toBe(true);
+    app.newGame();
+    element('btn-hyper-intermediate').click();
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(paintsMono(app)).toBe(true);
+    expect(loadColorEnabled()).toBe(false);
+  });
+
+  it('keeps the color switch usable when browser storage is denied', () => {
+    vi.stubGlobal('localStorage', {
+      getItem: () => { throw new Error('Storage reads denied'); },
+      setItem: () => { throw new Error('Storage writes denied'); },
+    });
+    const { app } = makeToolbar();
+    const button = element('btn-color');
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    button.click();
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(paintsMono(app)).toBe(true);
+    button.click();
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(paintsMono(app)).toBe(false);
   });
 
   it('opens one menu at a time, closes on Escape with focus restored, and closes on an outside click', async () => {
