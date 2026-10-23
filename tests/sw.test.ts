@@ -95,6 +95,10 @@ function setupWorker(template: string, resources: Record<string, string>, revisi
 const resources = {
   'index.html': '<html><script src="assets/index-12345678.js"></script></html>',
   'assets/index-12345678.js': 'window.playable = true;',
+  'assets/index-12345678.css': '.window { background: silver; }',
+  'assets/ms_sans_serif-12345678.woff2': 'regular font bytes',
+  'assets/ms_sans_serif_bold-12345678.woff2': 'bold font bytes',
+  'licenses/98.css-LICENSE.txt': 'Copyright 2020 Jordan Scales',
   'assets/atlas.json': '{"version":1}',
   'assets/atlas.png': 'atlas pixels',
   'assets/atlas-bw.png': 'monochrome atlas pixels',
@@ -202,7 +206,8 @@ describe('build-derived precache', () => {
     const dir = await mkdtemp(join(tmpdir(), 'complexweeper-sw-'));
     temporaryDirectories.push(dir);
     await mkdir(join(dir, 'assets', 'sounds'), { recursive: true });
-    for (const [path, body] of Object.entries({ ...resources, 'assets/index-12345678.css': '.board { display: block; }', 'assets/icon-512.png': 'large icon' })) {
+    await mkdir(join(dir, 'licenses'));
+    for (const [path, body] of Object.entries({ ...resources, 'assets/icon-512.png': 'large icon' })) {
       await writeFile(join(dir, path), body);
     }
     const first = await writeServiceWorker(dir, templatePath);
@@ -211,6 +216,8 @@ describe('build-derived precache', () => {
       'index.html', 'assets/index-12345678.js', 'assets/index-12345678.css', 'manifest.webmanifest',
       'assets/atlas.json', 'assets/atlas.png', 'assets/atlas-bw.png', 'assets/icon-192.png', 'assets/icon-512.png',
       'assets/sounds/tick.wav',
+      'assets/ms_sans_serif-12345678.woff2', 'assets/ms_sans_serif_bold-12345678.woff2',
+      'licenses/98.css-LICENSE.txt',
     ]));
     expect(source).toContain(first.revision);
     expect(source).not.toContain('__CW_PRECACHE__');

@@ -7,7 +7,7 @@
 翻开所有非雷格子就胜利。
 结局会用勾和叉显示标对、标错的雷，并播放对应音效。
 
-**纯静态 Web 应用**：Vite + TypeScript + Canvas 2D，无运行时依赖、无后端，构建产物可直接托管到任意静态平台，支持 PWA 离线游玩。
+**纯静态 Web 应用**：Vite + TypeScript + Canvas 2D，工具条、弹窗与表单使用 98.css，无第三方 JavaScript 运行时依赖、无后端。样式与字体随构建本地打包，构建产物可直接托管到任意静态平台，支持 PWA 离线游玩。
 
 **在线试玩**：https://miofelix.github.io/complexweeper-web/
 
@@ -96,6 +96,7 @@ src/game/        规则引擎（纯 TypeScript，不依赖 DOM，可独立测试
 src/render/      Canvas 2D 渲染（图集加载、布局计算、绘制）
 src/input/       鼠标 + 触屏输入 → 语义动作
 src/app/         装配：计时、最高分纪录、对话框、工具条
+src/styles.css   98.css 之上的布局、中文字体、触屏与交互状态适配
 tests/           vitest 单测
 docs/           素材授权与上游同步说明
 scripts/         图标生成等构建辅助脚本
@@ -106,3 +107,5 @@ scripts/         图标生成等构建辅助脚本
 代码按 GPL-3.0 授权（见 `LICENSE`）。图像素材分两类：扫雷原始图像素材的权利属于 Microsoft，**不在** GPL-3.0 授权范围内；新增素材由青月晓绘制，随仓库按 GPL-3.0 发布。详见 [docs/ASSETS.md](docs/ASSETS.md)。
 
 本程序是独立复刻作品，与 Microsoft 公司无隶属关系。"Minesweeper"、"扫雷"及相关商标归各自权利人所有。
+
+界面样式使用 Jordan Scales 的 [98.css](https://github.com/jdan/98.css)（固定版本 0.1.21，MIT）。样式与其附带字体通过 npm/Vite 本地打包，发行产物保留完整声明：`licenses/98.css-LICENSE.txt`（源码位于 `public/licenses/98.css-LICENSE.txt`）。

@@ -1,4 +1,4 @@
-// 对话框：自定义棋盘 / 最高分纪录 / 玩法与操作 / 关于。经典扫雷风格的白底弹窗。
+// 对话框：自定义棋盘 / 最高分纪录 / 玩法与操作 / 关于。98.css 经典窗口，保留键盘与焦点管理。
 
 import { splitEvenly } from '../game/game';
 import type { GameMode } from '../game/constants';
@@ -37,15 +37,19 @@ function openDialog(title: string, body: HTMLElement, onClose?: () => void): voi
   const overlay = document.createElement('div');
   overlay.className = 'dlg-overlay';
   const box = document.createElement('div');
-  box.className = 'dlg-box';
+  box.className = 'window dlg-box';
   box.setAttribute('role', 'dialog');
   box.setAttribute('aria-modal', 'true');
   box.tabIndex = -1;
   const head = document.createElement('div');
-  head.id = `dlg-title-${++dialogId}`;
-  head.className = 'dlg-title';
-  head.textContent = title;
-  box.setAttribute('aria-labelledby', head.id);
+  head.className = 'title-bar dlg-title';
+  const caption = document.createElement('div');
+  caption.id = `dlg-title-${++dialogId}`;
+  caption.className = 'title-bar-text';
+  caption.textContent = title;
+  head.appendChild(caption);
+  body.classList.add('window-body');
+  box.setAttribute('aria-labelledby', caption.id);
   box.appendChild(head);
   box.appendChild(body);
   overlay.appendChild(box);
@@ -110,7 +114,7 @@ function makeButton(label: string, primary = false): HTMLButtonElement {
   const b = document.createElement('button');
   b.type = 'button';
   b.textContent = label;
-  b.className = primary ? 'dlg-btn primary' : 'dlg-btn';
+  b.className = primary ? 'dlg-btn default' : 'dlg-btn';
   return b;
 }
 

@@ -7,7 +7,7 @@ Minesweeper, but the mines are complex numbers. Choose circular complex mode or 
 Reveal every non-mine cell to win.
 At the end, checkmarks and crosses show correctly and incorrectly identified mines, with sound effects for each mine type and for winning.
 
-**A pure static web app**: Vite + TypeScript + Canvas 2D, no runtime dependencies, no backend. The build output can be hosted on any static platform and works offline as a PWA.
+**A pure static web app**: Vite + TypeScript + Canvas 2D, with 98.css for the toolbar, dialogs, and form controls. No third-party JavaScript runtime dependencies or backend. Styles and fonts are bundled locally; the build output can be hosted on any static platform and works offline as a PWA.
 
 **Play online**: https://miofelix.github.io/complexweeper-web/
 
@@ -96,6 +96,7 @@ src/game/        rule engine (pure TypeScript, no DOM, independently testable)
 src/render/      Canvas 2D rendering (atlas loading, layout, painting)
 src/input/       mouse + touch input → semantic actions
 src/app/         glue: timer, best scores, dialogs, toolbar
+src/styles.css   layout, Chinese fonts, touch sizing, and state adapters for 98.css
 tests/           vitest unit tests
 docs/           asset licensing and upstream synchronization notes
 scripts/         build helpers (icon generation)
@@ -106,3 +107,5 @@ scripts/         build helpers (icon generation)
 The code is licensed under GPL-3.0 (see `LICENSE`). The image assets fall into two categories: the original Minesweeper graphics belong to Microsoft and are **not** covered by GPL-3.0; the new graphics were drawn by 青月晓 and are published with the repository under GPL-3.0. See [docs/ASSETS.md](docs/ASSETS.md) for details.
 
 This is an independent re-implementation and is not affiliated with Microsoft. "Minesweeper" and related trademarks belong to their respective owners.
+
+The interface uses Jordan Scales's [98.css](https://github.com/jdan/98.css) (pinned to 0.1.21, MIT). Its styles and bundled fonts are packaged locally with npm/Vite. The full notice is included in the build at `licenses/98.css-LICENSE.txt` (source: `public/licenses/98.css-LICENSE.txt`).
